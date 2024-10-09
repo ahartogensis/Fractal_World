@@ -35,6 +35,7 @@ def create_tree(pos, az_angle, pol_angle, length, depth, group):
 
     if pol_angle > 90:
         #reverse the surface if the reverse is true
+        #only if it is greater than 90 degrees from the y axis
         cmds.reverseSurface(branch, direction=2, constructionHistory=True, replaceOriginal=True)
 
     #Clean up the profile and curve by deleting them after extrusion

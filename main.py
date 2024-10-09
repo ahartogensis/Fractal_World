@@ -116,6 +116,7 @@ class Fractal_Mountain_Window(object):
         
         #set a hypershade to the mountain
         material_name = 'mountain_m'
+        #creates new material if not already there
         if not cmds.objExists(material_name):
             material = cmds.shadingNode('lambert', asShader=True, name=material_name)
             shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=material_name + "SG")
