@@ -17,7 +17,7 @@ buttons:
     generates the mountain
     expands either left or right of the mountain you select (after you extand, you must reselect the middle portion)
     (keep size consistant for this feature to work)
-    Add trees of number of trees
+    Add trees of number of trees (must be clicked on the mountain you want to add trees to)
     Clear the scene
     Reset the parameters given 
     Close the GUi
@@ -114,7 +114,18 @@ class Fractal_Mountain_Window(object):
         
         self.mountain = frac_mountain.create_fractal_mountain(size=self.size, subdivisions=self.subdivisions, randomness=self.randomness,x=self.x,y=self.y,z=self.z)
         
+        #set a hypershade to the mountain
+        material_name = 'mountain_m'
+        if not cmds.objExists(material_name):
+            material = cmds.shadingNode('lambert', asShader=True, name=material_name)
+            shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=material_name + "SG")
+            cmds.connectAttr(material_name + ".outColor", shading_group + ".surfaceShader", force=True)
+        else:
+            shading_group = material_name + "SG"
+        cmds.setAttr(material_name + ".color", 0.133, 0.545, 0.133, type="double3")
+
         cmds.select(self.mountain)
+        cmds.hyperShade(assign=shading_group)
     
     def duplicate_mountain_right(self, *args):
         mountain = cmds.ls(selection=True)
@@ -139,8 +150,9 @@ class Fractal_Mountain_Window(object):
             print("Need to create first Mountain")
     
     def create_trees(self, *args):
-        if self.mountain:
-            vertices = cmds.ls(f"{self.mountain}.vtx[*]", flatten=True)
+        mountain = cmds.ls(selection=True)[0]
+        if mountain:
+            vertices = cmds.ls(f"{mountain}.vtx[*]", flatten=True)
             self.trees = cmds.intSliderGrp(self.input_trees, query=True, value=True)
             
             for _ in range(self.trees):
@@ -149,6 +161,17 @@ class Fractal_Mountain_Window(object):
                 pos = cmds.pointPosition(v, world=True)
                 
                 tree = fractal_tree.generate_fractal_tree(pos, trunk_length=0.5, max_depth=4)
+                material_name = 'tree_m'
+                if not cmds.objExists(material_name):
+                    material = cmds.shadingNode('lambert', asShader=True, name=material_name)
+                    shading_group = cmds.sets(renderable=True, noSurfaceShader=True, empty=True, name=material_name + "SG")
+                    cmds.connectAttr(material_name + ".outColor", shading_group + ".surfaceShader", force=True)
+                else:
+                    shading_group = material_name + "SG"
+                cmds.setAttr(material_name + ".color", 0.212, 0.149, 0.141, type="double3")
+        
+                cmds.select(tree)
+                cmds.hyperShade(assign=shading_group)
         else:
             print("No mountain yet")  
             
